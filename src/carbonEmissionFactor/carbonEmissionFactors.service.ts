@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { CarbonEmissionFactor } from "./carbonEmissionFactor.entity";
@@ -13,6 +13,15 @@ export class CarbonEmissionFactorsService {
 
   findAll(): Promise<CarbonEmissionFactor[]> {
     return this.carbonEmissionFactorRepository.find();
+  }
+
+  async findName(name: string): Promise<CarbonEmissionFactor> {
+    let carbonEmissionFactors = await this.carbonEmissionFactorRepository.find({ where: { name: name } });
+    if (carbonEmissionFactors.length === 0){
+      throw new NotFoundException('No carbon emission factor was found by name ' + name);
+    }
+
+    return carbonEmissionFactors[0];
   }
 
   save(

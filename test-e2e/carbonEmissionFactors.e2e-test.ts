@@ -1,7 +1,7 @@
 import { INestApplication } from "@nestjs/common";
 import { Test, TestingModule } from "@nestjs/testing";
 import * as request from "supertest";
-import { dataSource } from "../config/dataSource";
+import { dataSource, GreenlyDataSource } from "../config/dataSource";
 import { AppModule } from "../src/app.module";
 import { CarbonEmissionFactor } from "../src/carbonEmissionFactor/carbonEmissionFactor.entity";
 import { getTestEmissionFactor } from "../src/seed-dev-data";
@@ -11,6 +11,7 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
+  await GreenlyDataSource.cleanDatabase();
   await dataSource.destroy();
 });
 

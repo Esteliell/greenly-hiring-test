@@ -28,10 +28,10 @@ describe("CarbonEmissionFactors.service", () => {
       hamEmissionFactor,
       flourEmissionFactor,
     ]);
-    const retrieveChickenEmissionFactor = await dataSource
+    const retrieveFlourEmissionFactor = await dataSource
       .getRepository(CarbonEmissionFactor)
       .findOne({ where: { name: "flour" } });
-    expect(retrieveChickenEmissionFactor?.name).toBe("flour");
+    expect(retrieveFlourEmissionFactor?.name).toBe("flour");
   });
   it("should retrieve emission Factors", async () => {
     const carbonEmissionFactors = await carbonEmissionFactorService.findAll();
@@ -40,5 +40,6 @@ describe("CarbonEmissionFactors.service", () => {
 });
 
 afterAll(async () => {
+  await GreenlyDataSource.cleanDatabase();
   await dataSource.destroy();
 });

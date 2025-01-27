@@ -1,5 +1,7 @@
-import { dataSource } from "../config/dataSource";
+import { dataSource, GreenlyDataSource } from "../config/dataSource";
 import { CarbonEmissionFactor } from "./carbonEmissionFactor/carbonEmissionFactor.entity";
+import { CarbonFootprintProduct } from "./carbonFootprintProduct/carbonFootprintProduct.entity";
+import { ProductIngredient } from "./carbonFootprintProduct/productIngredient.entity";
 
 export const TEST_CARBON_EMISSION_FACTORS = [
   {
@@ -71,6 +73,73 @@ export const getTestEmissionFactor = (name: string) => {
   return emissionFactor;
 };
 
+export const TEST_CARBON_FOOTPRINT_PRODUCTS = [
+  {
+    name: "hamCheesePizza",
+    totalCarbonFootprint: null,
+    ingredients: [
+      { name: "ham", quantity: 0.1, unit: "kg" },
+      { name: "cheese", quantity: 0.15, unit: "kg" },
+      { name: "tomato", quantity: 0.4, unit: "kg" },
+      { name: "flour", quantity: 0.7, unit: "kg" },
+      { name: "oliveOil", quantity: 0.3, unit: "kg" },
+    ],
+  },
+  {
+    name: "hamCheeseGramsPizza",
+    totalCarbonFootprint: null,
+    ingredients: [
+      { name: "ham", quantity: 0.1, unit: "kg" },
+      { name: "cheese", quantity: 0.15, unit: "kg" },
+      { name: "tomato", quantity: 0.4, unit: "kg" },
+      { name: "flour", quantity: 0.7, unit: "kg" },
+      { name: "oliveOil", quantity: 0.3, unit: "kg" },
+    ],
+  },
+  {
+    name: "doubleCheesePizza",
+    totalCarbonFootprint: null,
+    ingredients: [
+      { name: "cheese", quantity: 0.15, unit: "kg" },
+      { name: "blueCheese", quantity: 0.15, unit: "t" },
+      { name: "tomato", quantity: 0.4, unit: "kg" },
+      { name: "flour", quantity: 0.7, unit: "kg" },
+      { name: "oliveOil", quantity: 0.3, unit: "kg" },
+    ],
+  },
+].map((args) => {
+  let product = new CarbonFootprintProduct({
+    name: args.name,
+    totalCarbonFootprint: null,
+    ingredients: [],
+  });
+
+  const ingredients = args.ingredients.map((ingredient) =>
+      new ProductIngredient({
+      name: ingredient.name,
+      quantity: ingredient.quantity,
+      unit: ingredient.unit,
+      product: product,
+      carbonEmissionFactor : getTestEmissionFactor(ingredient.name)
+      }));
+
+  product.ingredients = ingredients;
+  return product;
+});
+
+
+export const getTestCarbonFootprintProduct = (name: string) => {
+  const carbonFootprintProduct = TEST_CARBON_FOOTPRINT_PRODUCTS.find(
+    (ef) => ef.name === name
+  );
+  if (!carbonFootprintProduct) {
+    throw new Error(
+      `test product with name ${name} could not be found`
+    );
+  }
+  return carbonFootprintProduct;
+};
+
 export const seedTestCarbonEmissionFactors = async () => {
   if (!dataSource.isInitialized) {
     await dataSource.initialize();
@@ -81,6 +150,23 @@ export const seedTestCarbonEmissionFactors = async () => {
   await carbonEmissionFactorsService.save(TEST_CARBON_EMISSION_FACTORS);
 };
 
+
+export const seedTestCarbonFootprintProducts = async () => {
+  if (!dataSource.isInitialized) {
+    await dataSource.initialize();
+  }
+
+  GreenlyDataSource.cleanDatabase();
+
+  const carbonFootprintProductService =
+    dataSource.getRepository(CarbonFootprintProduct);
+
+  await seedTestCarbonEmissionFactors();
+
+  await carbonFootprintProductService.save(TEST_CARBON_FOOTPRINT_PRODUCTS);
+};
+
+
 if (require.main === module) {
-  seedTestCarbonEmissionFactors().catch((e) => console.error(e));
+  seedTestCarbonFootprintProducts().catch((e) => console.error(e));
 }

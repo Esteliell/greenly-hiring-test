@@ -105,3 +105,45 @@ Once an endpoint is created, it can then be used by the front-end, build on the 
 
 This part does not need to be shared before-hand but can be presented during the interview.
 
+# What did I do ?
+
+### Entities & DTO
+
+- CarbonFootprintProduct : represents the foodproduct we want to calculate Agrobalise carbon footprint for.
+- ProductIngredient  : represents each ingredient for a product. Linked to a carbon emission factor.
+
+### Service
+
+- CarbonFootprintProductsService
+	- public
+		- findAll
+		- save
+		- getProductEmission
+		- calculateEmission
+	- private
+		- calculateTotalEmission
+		- handleConversion
+
+- CarbonEmissionFactorsService
+	- findName (to find more easily the IDs of products to calculate emissions for)
+
+> *:fa-question-circle:  Why handle some conversion ?*
+>
+>The criteria of "matching unit" for the carbon emission factor implies that, even if the above test data was all in kilogram, it is not meant to always be that way. Some conversion handler has then to be implemented, and the mg/g/kg is an easy option to start with.
+
+### Controller
+
+- CarbonFootprintProductsController : `/carbon-footprint-products/`
+	- `GET ./` : getCarbonFootprintProducts, get all products with ingredients and associated emission factors
+	- `GET ./:id` : get calculated Agrobalise emission for product with matching ID
+	- `POST /:id/calculate-emission` : calculate and save emission for product with matching ID
+
+### Tests
+- Tests for new entities
+- Tests for service 
+- E2E tests (in the code and via Postman)
+
+### Retool
+
+Though it is not required to share it yet, I have done it already so I might as well share it now : https://morganer.retool.com/app/greenlyhiringtest/interactive-table
+It is a possibility I might tinker with it til the technical interview.
